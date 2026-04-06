@@ -449,7 +449,7 @@ export default function WaterAIReport() {
                 })}
               </div>
               <div style={{ padding: "14px 18px", border: `1px solid ${T.badBorder}`, background: T.badSoft, fontSize: 13, color: T.textSub, lineHeight: 1.8, fontWeight: 400 }}>
-                <span style={{ color: T.bad, fontWeight: 500 }}>water (워터)</span> — 자연 질문 16개에서 5개 AI 모두 <span style={{ color: T.bad, fontWeight: 500 }}>0/80 미언급</span>. 타 CPO는 웹 검색 없이도 AI가 알고 있는 반면, 워터는 이름을 직접 물어야 겨우 인지합니다.
+                <span style={{ color: T.bad, fontWeight: 500 }}>water (워터)</span> — 16개 프롬프트 × 5개 AI, 총 80회 질문 중 <span style={{ color: T.bad, fontWeight: 500 }}>5회만 언급 (5/80)</span>. 웹 검색 ON 시 평균 12/16으로 급등하므로 학습 데이터 부재가 원인입니다.
               </div>
             </div>
 
