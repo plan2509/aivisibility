@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 
-const SECTIONS = ["diagnosis", "ai_test", "map", "action", "timeline"];
+const SECTIONS = ["overview", "diagnosis", "ai_test", "map", "action", "timeline"];
 const SECTION_LABELS = {
+  overview: "프로젝트 개요",
   diagnosis: "웹사이트 기술 진단",
   ai_test: "AI 노출 테스트",
   map: "충전소 노출 채널",
@@ -15,8 +16,8 @@ const diagnosisActionItems = [
   { name: "FAQ 구조화 페이지", status: "critical", scope: "주도", detail: "별도 FAQ 페이지 미존재. AI가 인용(citation)할 Q&A 소스가 전무.", action: "FAQPage 스키마와 함께 한국어 FAQ 구축 (개발 협업)" },
   { name: "JavaScript 렌더링 의존도", status: "critical", scope: "주도", detail: "Next.js 기반으로 JS 미실행 AI 크롤러는 콘텐츠를 아예 못 읽을 가능성 높음.", action: "SSR 확인 및 핵심 페이지 정적 HTML 제공 또는 llms.txt로 보완 (개발 협업)" },
   { name: "텍스트 콘텐츠 밀도", status: "critical", scope: "주도", detail: "이미지/영상 중심 구성. '3초 충전' 외 AI가 읽을 수 있는 팩트 정보 극히 부족.", action: "회사 개요, 충전소 수, 기술 스펙 등 콘텐츠 구조 설계 (서비스 기획 주도 · 실제 작성은 마케팅 협업)" },
-  { name: "robots.txt AI 크롤러 정책", status: "confirmed", scope: "주도", detail: "접근 차단 또는 미설정. 의도치 않게 AI 크롤러가 차단될 가능성.", action: "GPTBot, ClaudeBot 등 AI 크롤러별 허용/차단 정책 명시" },
-  { name: "영문 반영 검토", status: "critical", scope: "주도", detail: "전체 사이트 한국어 only. 글로벌 AI는 영문 학습 비중이 압도적. 별도 영문 페이지 없이도 llms.txt·Schema.org에 영문 섹션 추가로 대응 가능.", action: "llms.txt 영문 섹션 추가 + Schema.org description 영문 병기 (개발 협업)" },
+  { name: "robots.txt AI 크롤러 정책", status: "warning", scope: "주도", detail: "접근 차단 또는 미설정. 의도치 않게 AI 크롤러가 차단될 가능성.", action: "GPTBot, ClaudeBot 등 AI 크롤러별 허용/차단 정책 명시" },
+  { name: "영문 콘텐츠 구조화", status: "warning", scope: "주도", detail: "전체 사이트 한국어 only. 글로벌 AI는 영문 학습 비중이 압도적. 별도 영문 페이지 없이도 llms.txt·Schema.org에 영문 섹션 추가로 대응 가능.", action: "llms.txt 영문 섹션 추가 + Schema.org description 영문 병기 (개발 협업)" },
 ];
 
 const diagnosisMonitorItems = [
@@ -65,7 +66,7 @@ const mapPlatforms = [
   { group: "OEM·차량 연동", name: "현대 블루링크", checkedDate: "", operator: "현대자동차", source: "자체 DB + 환경공단 API", priority: "중간", status: "미확인", nameMatch: "미확인", addressMatch: "미확인", hoursMatch: "미확인", logo: "", manager: "", note: "" },
   { group: "OEM·차량 연동", name: "기아 커넥트", checkedDate: "", operator: "기아", source: "자체 DB + 환경공단 API", priority: "중간", status: "미확인", nameMatch: "미확인", addressMatch: "미확인", hoursMatch: "미확인", logo: "", manager: "", note: "" },
   { group: "OEM·차량 연동", name: "BMW 커넥티드 드라이브", checkedDate: "", operator: "BMW Korea", source: "자체 DB + GS차지비 제휴", priority: "낮음", status: "미확인", nameMatch: "미확인", addressMatch: "미확인", hoursMatch: "미확인", logo: "", manager: "", note: "" },
-  { group: "글로벌·기타", name: "Google Maps", checkedDate: "2026.03.23", operator: "Google", source: "Google POI (직접 등록)", priority: "높음", status: "미노출", nameMatch: "미노출", addressMatch: "미노출", hoursMatch: "미노출", logo: "없음", manager: "김도연", note: "워터 Water 등록·4.0★. 충전소 개별 등록 추가 필요. AI 기반 EV Trip Planner 350+ 모델 확대 — 데이터 품질이 추천 알고리즘 노출에 직결" },
+  { group: "글로벌·기타", name: "Google Maps", checkedDate: "2026.03.23", operator: "Google", source: "Google POI (직접 등록)", priority: "높음", status: "미노출", nameMatch: "미노출", addressMatch: "미노출", hoursMatch: "미노출", logo: "없음", manager: "김도연", note: "워터 Water 등록·4.0★. 충전소 개별 등록 추가 필요" },
   { group: "글로벌·기타", name: "Apple Maps", checkedDate: "2026.03.23", operator: "Apple", source: "Apple POI (직접 등록)", priority: "높음", status: "미노출", nameMatch: "미노출", addressMatch: "미노출", hoursMatch: "미노출", logo: "없음", manager: "김도연", note: "워터/water 검색 시 관련 없는 장소만 노출. Apple Maps Connect 등록 필요" },
   { group: "글로벌·기타", name: "PlugShare", checkedDate: "2026.03.23", operator: "Recargo (글로벌)", source: "사용자 제보 + CPO 파트너", priority: "중간", status: "노출", nameMatch: "미노출", addressMatch: "맞음", hoursMatch: "미노출", logo: "없음", manager: "김도연", note: "타사 충전소도 이름이 나오지 않음" },
   { group: "글로벌·기타", name: "Waze", checkedDate: "2026.03.23", operator: "Google (Waze)", source: "Google POI 연동", priority: "낮음", status: "미노출", nameMatch: "미노출", addressMatch: "미노출", hoursMatch: "미노출", logo: "없음", manager: "김도연", note: "" },
@@ -76,14 +77,14 @@ const actionItems = [
   { priority: "★★★", task: "Schema.org 구조화 데이터 설계 (공개 지식 DB 보완 수단)", period: "2 - 4주", difficulty: "중", collab: "개발", ceo: "#1", done: true },
   { priority: "★★☆", task: "FAQ 페이지 구조 설계", period: "2 - 3주", difficulty: "하", collab: "개발", ceo: "#1", done: false },
   { priority: "★★☆", task: "robots.txt AI 크롤러 정책 설계", period: "1주", difficulty: "하", collab: "개발", ceo: "#1", done: true },
-  { priority: "★★☆", task: "영문 반영 검토 (llms.txt·Schema.org 영문 섹션 추가)", period: "1 - 2주", difficulty: "하", collab: "개발", ceo: "#1", done: false },
+  { priority: "★★☆", task: "영문 콘텐츠 구조화 (llms.txt·Schema.org 영문 섹션 추가)", period: "1 - 2주", difficulty: "하", collab: "개발", ceo: "#1", done: false },
   { priority: "★★☆", task: "지도 플랫폼 모니터링 매뉴얼 설계", period: "2 - 3주", difficulty: "중", collab: "유관부서", ceo: "#6", done: false },
 ];
 
 const phases = [
   { phase: 0, name: "Baseline 진단", period: "1주차", color: "#6B7B52", status: "완료", items: ["AI 노출 테스트 매트릭스 실행 ✓", "지도 플랫폼 채널 전수조사 (진행 중)", "웹사이트 기술 진단 완료 ✓", "→ 대표님 보고"] },
   { phase: 1, name: "Quick wins", period: "2 - 3주차", color: "#4A7B6A", status: "진행중", items: ["llms.txt 작성 완료 ✓", "robots.txt AI 정책 설계 완료 ✓", "Schema.org 설계 완료 ✓", "→ 개발 배포 대기"] },
-  { phase: 2, name: "구조 강화", period: "4 - 8주차", color: "#9E7B4A", status: "예정", items: ["EVChargingStation 스키마 완성", "FAQ 페이지 구축", "영문 반영 검토", "모니터링 매뉴얼 확정"] },
+  { phase: 2, name: "구조 강화", period: "4 - 8주차", color: "#9E7B4A", status: "예정", items: ["EVChargingStation 스키마 완성", "FAQ 페이지 구축", "영문 콘텐츠 구조화", "모니터링 매뉴얼 확정"] },
   { phase: 3, name: "측정 및 최적화", period: "9주차~", color: "#5A5A72", status: "예정", items: ["2차 AI 노출 테스트", "전후 비교 리포트", "월간 모니터링 정례화", "전략 고도화"] },
 ];
 
@@ -103,9 +104,8 @@ const T = {
 const StatusBadge = ({ status }) => {
   const config = {
     critical: { bg: T.badSoft, text: T.bad, border: T.badBorder, label: "미적용" },
-    confirmed: { bg: T.tealSoft, text: T.teal, border: T.tealBorder, label: "확인" },
     warning: { bg: T.warnSoft, text: T.warn, border: T.warnBorder, label: "미확인" },
-    good: { bg: T.goodSoft, text: T.good, border: T.goodBorder, label: "적용" },
+    good: { bg: T.goodSoft, text: T.good, border: T.goodBorder, label: "양호" },
   };
   const c = config[status];
   return <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 2, fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", background: c.bg, color: c.text, border: `1px solid ${c.border}` }}>{c.label}</span>;
@@ -145,20 +145,19 @@ async function apiWrite(payload) {
 }
 
 export default function WaterAIReport() {
-  const [activeSection, setActiveSection] = useState("diagnosis");
+  const [activeSection, setActiveSection] = useState("overview");
   const [expandedDiag, setExpandedDiag] = useState(null);
   const [aiTestFilter, setAiTestFilter] = useState("전체");
   const [livePrompts, setLivePrompts] = useState(aiTestPrompts);
   const [liveChannels, setLiveChannels] = useState(mapPlatforms);
   const [liveActionItems, setLiveActionItems] = useState(actionItems);
-  const [liveDiagnosis, setLiveDiagnosis] = useState(diagnosisItems);
   const [lastSaved, setLastSaved] = useState("");
   const [adminMode, setAdminMode] = useState(false);
   const [adminPw, setAdminPw] = useState("");
   const [showAdminPw, setShowAdminPw] = useState(false);
   const [pwError, setPwError] = useState("");
   const [syncStatus, setSyncStatus] = useState("");
-  const [adminTab, setAdminTab] = useState("diag");
+  const [adminTab, setAdminTab] = useState("ai");
   const [aiAdminMode, setAiAdminMode] = useState("off");
 
   const dataLoaded = React.useRef(false);
@@ -170,17 +169,15 @@ export default function WaterAIReport() {
         if (d.prompts) setLivePrompts(d.prompts);
         if (d.channels && d.channels.length > 0) setLiveChannels(d.channels);
         if (d.actionItems) setLiveActionItems(d.actionItems);
-        if (d.diagnosis) setLiveDiagnosis(d.diagnosis);
         if (d.lastSaved) setLastSaved(d.lastSaved);
       }
       dataLoaded.current = true;
     })();
   }, []);
 
-  const criticalCount = liveDiagnosis.filter(d => d.status === "critical").length;
-  const confirmedCount = liveDiagnosis.filter(d => d.status === "confirmed").length;
-  const warningCount = liveDiagnosis.filter(d => d.status === "warning").length;
-  const goodCount = liveDiagnosis.filter(d => d.status === "good").length;
+  const criticalCount = diagnosisItems.filter(d => d.status === "critical").length;
+  const warningCount = diagnosisItems.filter(d => d.status === "warning").length;
+  const goodCount = diagnosisItems.filter(d => d.status === "good").length;
   const avg = (key) => (livePrompts.reduce((s, p) => s + p[key], 0) / aiTestPrompts.length).toFixed(1);
   const aiPlatforms = [
     { key: "gemini", label: "Gemini", avg: avg("gemini"), color: T.good, mentions: livePrompts.filter(p => p.gemini > 0).length, warn: null },
@@ -204,9 +201,6 @@ export default function WaterAIReport() {
   function addActionItem() { setLiveActionItems(prev => [...prev, { priority: "★☆☆", task: "새 과제", period: "", difficulty: "하", collab: "개발", ceo: "#1", done: false }]); }
   function removeActionItem(idx) { setLiveActionItems(prev => prev.filter((_, i) => i !== idx)); }
   function updateActionItem(idx, key, val) { setLiveActionItems(prev => prev.map((a, i) => i === idx ? { ...a, [key]: val } : a)); }
-  function updateDiagItem(idx, key, val) { setLiveDiagnosis(prev => prev.map((d, i) => i === idx ? { ...d, [key]: val } : d)); }
-  function addDiagItem() { setLiveDiagnosis(prev => [...prev, { name: "새 항목", status: "critical", scope: "주도", detail: "", action: "" }]); }
-  function removeDiagItem(idx) { setLiveDiagnosis(prev => prev.filter((_, i) => i !== idx)); }
 
   useEffect(() => {
     if (!adminMode || !dataLoaded.current) return;
@@ -214,12 +208,12 @@ export default function WaterAIReport() {
       const now = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
       const today = new Date().toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" }).replace(/\. /g, ".").replace(/\.$/, "");
       const updatedChannels = liveChannels.map(c => ({ ...c, checkedDate: c.checkedDate || today }));
-      const ok = await apiWrite({ prompts: livePrompts, channels: updatedChannels, actionItems: liveActionItems, diagnosis: liveDiagnosis, lastSaved: now });
+      const ok = await apiWrite({ prompts: livePrompts, channels: updatedChannels, actionItems: liveActionItems, lastSaved: now });
       if (ok) { setLastSaved(now); setSyncStatus("자동 저장됨"); } else { setSyncStatus("저장 실패"); }
       setTimeout(() => setSyncStatus(""), 2000);
     }, 1000);
     return () => clearTimeout(timer);
-  }, [livePrompts, liveChannels, liveActionItems, liveDiagnosis, adminMode]);
+  }, [livePrompts, liveChannels, liveActionItems, adminMode]);
 
   const STATUS_OPTIONS = ["노출", "노출(이슈)", "미노출", "미확인"];
   const MATCH_OPTIONS = ["맞음", "이슈 ⚠", "미노출", "미확인"];
@@ -280,6 +274,147 @@ export default function WaterAIReport() {
       {/* ── Content ── */}
       <div style={{ padding: "36px 44px" }}>
 
+        {/* === OVERVIEW === */}
+        {activeSection === "overview" && (
+          <div className="section">
+            <div style={{ marginBottom: 36, paddingLeft: 24, borderLeft: `2px solid ${T.accent}` }}>
+              <div className="sans" style={{ fontSize: 9, color: T.accent, letterSpacing: 3, textTransform: "uppercase", marginBottom: 12 }}>대표님 과제 지시 · 2026년 3월</div>
+              <p style={{ fontSize: 15, color: T.textSub, lineHeight: 2, fontStyle: "italic", fontWeight: 400 }}>"AI에게 노출되는 사업/서비스/회사 형태의 구조로 개편 목표"</p>
+            </div>
+
+            <div style={{ marginBottom: 28, padding: "18px 22px", border: `1px solid ${T.border}`, background: T.surface }}>
+              <div style={{ fontSize: 14, fontWeight: 500, color: T.text, marginBottom: 12 }}>서비스 기획 담당 과제</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {[["#1", "위키피디아·공개 지식 DB 보완 — Schema.org, llms.txt, FAQ 설계 주도"], ["#6", "지도 플랫폼 모니터링 매뉴얼 설계 — 매뉴얼 기반 실제 관리는 유관부서"]].map(([num, desc]) => (
+                  <div key={num} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                    <span className="sans" style={{ fontSize: 10, fontWeight: 600, color: T.purple, background: T.purpleSoft, padding: "2px 8px", borderRadius: 2, flexShrink: 0, marginTop: 2 }}>{num}</span>
+                    <span style={{ fontSize: 13, color: T.textSub, lineHeight: 1.7, fontWeight: 400 }}>{desc}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 28, padding: "18px 22px", border: `1px solid ${T.badBorder}`, background: T.badSoft }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                <span style={{ fontSize: 14 }}>⚠</span>
+                <div style={{ fontSize: 13, fontWeight: 600, color: T.bad }}>긴급 리스크 — Grok의 적극적 오답</div>
+              </div>
+              <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.8, fontWeight: 400 }}>
+                Grok(X 기반 AI)은 워터에 대해 "존재하지 않는 서비스"라고 <span style={{ color: T.bad, fontWeight: 500 }}>단언</span>합니다. 웹 검색 ON 시 10/16으로 급등하므로 학습 데이터 부재가 원인입니다. 영문 뉴스 확산과 구조화 데이터 적용으로 해소 가능하나, 마케팅·PR 협력이 필요합니다.
+              </p>
+            </div>
+
+            <div style={{ width: 40, height: 1, background: T.accent, margin: "32px 0" }} />
+
+            <div style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 14, fontWeight: 500 }}>AI 노출 현황</span>
+              <span className="sans" style={{ fontSize: 10, padding: "3px 10px", background: T.warnSoft, border: `1px solid ${T.warnBorder}`, color: T.warn }}>웹 검색 OFF 기준</span>
+            </div>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
+              {[
+                { label: "ChatGPT", key: "chatgpt", color: T.warn },
+                { label: "Claude", key: "claude", color: T.bad },
+                { label: "Gemini", key: "gemini", color: T.good },
+                { label: "Grok", key: "grok", color: T.bad },
+                { label: "Perplexity", key: "perplexity", color: T.bad },
+              ].map((m, i) => {
+                const cnt = livePrompts.filter(p => p[m.key] > 0).length;
+                return (
+                  <div key={i} style={{ flex: 1, minWidth: 120, background: T.surface, border: `1px solid ${T.border}`, padding: "16px 14px", textAlign: "center" }}>
+                    <div className="sans" style={{ fontSize: 11, color: T.textDim, marginBottom: 6, letterSpacing: 0.5 }}>{m.label}</div>
+                    <div style={{ fontSize: 24, fontWeight: 700, color: m.color, lineHeight: 1 }}>{cnt}/{livePrompts.length}</div>
+                    <div style={{ fontSize: 11, color: T.textDim, marginTop: 4 }}>{cnt === 0 ? "전체 미인지" : `${cnt}개 인지`}</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ marginBottom: 32, padding: "12px 16px", background: T.warnSoft, border: `1px solid ${T.warnBorder}`, fontSize: 12, color: T.textSub, lineHeight: 1.8, fontWeight: 400 }}>
+              웹 검색을 켜면 평균 <span style={{ color: T.good, fontWeight: 500 }}>10 - 15/16</span>으로 급등합니다. 언론 보도는 충분하나 AI가 학습할 구조화 데이터가 없습니다.
+            </div>
+
+            <div style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 14, fontWeight: 500 }}>웹사이트 기술 진단</span>
+              <span className="sans" style={{ fontSize: 10, color: T.textDim }}>10개 항목</span>
+            </div>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 32 }}>
+              {[
+                { label: "즉시 조치", value: criticalCount, sub: "Schema·llms·FAQ 등", color: T.bad, soft: T.badSoft, border: T.badBorder },
+                { label: "확인 필요", value: warningCount, sub: "robots·영문·법인명", color: T.warn, soft: T.warnSoft, border: T.warnBorder },
+                { label: "양호", value: goodCount, sub: "요금·채용 정보", color: T.good, soft: T.goodSoft, border: T.goodBorder },
+              ].map((d, i) => (
+                <div key={i} style={{ flex: 1, minWidth: 100, background: d.soft, border: `1px solid ${d.border}`, padding: "16px 14px", textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: d.color, marginBottom: 6 }}>{d.label}</div>
+                  <div style={{ fontSize: 28, fontWeight: 700, color: d.color, lineHeight: 1 }}>{d.value}</div>
+                  <div style={{ fontSize: 11, color: T.textDim, marginTop: 4 }}>{d.sub}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ marginBottom: 8, display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 14, fontWeight: 500 }}>지도 채널 실사 현황</span>
+              <span className="sans" style={{ fontSize: 10, color: T.textDim }}>22개 채널 중 {liveChannels.filter(p=>p.status!=='미확인').length}개 확인</span>
+            </div>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 32 }}>
+              {[
+                { label: "정상 노출", value: liveChannels.filter(p=>p.status==='노출').length, color: T.good, soft: T.goodSoft, border: T.goodBorder },
+                { label: "이슈 있음", value: liveChannels.filter(p=>p.status==='노출(이슈)').length, color: T.warn, soft: T.warnSoft, border: T.warnBorder },
+                { label: "미노출", value: liveChannels.filter(p=>p.status==='미노출').length, color: T.bad, soft: T.badSoft, border: T.badBorder },
+                { label: "미확인", value: liveChannels.filter(p=>p.status==='미확인').length, color: T.textDim, soft: `${T.textDim}08`, border: `${T.textDim}18` },
+              ].map((d, i) => (
+                <div key={i} style={{ flex: 1, minWidth: 100, background: d.soft, border: `1px solid ${d.border}`, padding: "16px 14px", textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: d.color, marginBottom: 6 }}>{d.label}</div>
+                  <div style={{ fontSize: 28, fontWeight: 700, color: d.color, lineHeight: 1 }}>{d.value}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ width: 40, height: 1, background: T.accent, margin: "32px 0" }} />
+
+            <div style={{ padding: 24, border: `1px solid ${T.purpleBorder}`, background: T.purpleSoft, marginBottom: 28 }}>
+              <div className="serif" style={{ fontSize: 16, color: T.purple, marginBottom: 12 }}>핵심 판단</div>
+              <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.9, fontWeight: 400, marginBottom: 16 }}>
+                watercharging.com은 AI 크롤러가 정보를 파싱할 수 없는 구조입니다. Schema.org, llms.txt, FAQ 등 구조적 요소가 전무합니다.
+              </p>
+              <div style={{ display: "flex", gap: 12 }}>
+                <div style={{ flex: 1, padding: "14px 16px", background: T.badSoft, border: `1px solid ${T.badBorder}`, textAlign: "center" }}>
+                  <div className="sans" style={{ fontSize: 10, color: T.textDim, marginBottom: 4 }}>현재 평균 (웹 검색 OFF)</div>
+                  <div style={{ fontSize: 24, fontWeight: 700, color: T.bad }}>
+                    {Math.round(AIS.reduce((s,k)=>s+livePrompts.filter(p=>p[k]>0).length,0)/5)}<span style={{ fontSize: 12 }}>/{livePrompts.length}</span>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", fontSize: 16, color: T.textDim, padding: "0 4px" }}>→</div>
+                <div style={{ flex: 1, padding: "14px 16px", background: T.goodSoft, border: `1px solid ${T.goodBorder}`, textAlign: "center" }}>
+                  <div className="sans" style={{ fontSize: 10, color: T.textDim, marginBottom: 4 }}>Phase 1 - 2 후 예상</div>
+                  <div style={{ fontSize: 24, fontWeight: 700, color: T.good }}>8<span style={{ fontSize: 12 }}>/{livePrompts.length}</span></div>
+                </div>
+              </div>
+              <div style={{ marginTop: 10, fontSize: 11, color: T.textDim, lineHeight: 1.6, fontWeight: 400 }}>
+                업계 AEO 사례 기반 보수적 추정. Phase 1 - 2 완료 후 약 3 - 6개월 경과 기준.
+              </div>
+            </div>
+
+            <div style={{ padding: "24px 28px", borderLeft: `3px solid ${T.teal}`, background: T.tealSoft }}>
+              <div className="sans" style={{ fontSize: 9, color: T.teal, letterSpacing: 3, textTransform: "uppercase", marginBottom: 14 }}>대표님께 요청드리는 사항</div>
+              <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 8 }}>Phase 1 즉시 착수 승인을 요청드립니다.</div>
+              <p style={{ fontSize: 13, color: T.textSub, lineHeight: 1.8, fontWeight: 400, marginBottom: 20 }}>
+                서비스 기획이 설계 완료한 3종 파일을 개발팀이 배포할 수 있도록 지시 부탁드립니다. 추가 예산 없이 <span style={{ fontWeight: 500, color: T.text }}>1 - 2주 내 실행 가능한 Quick Win</span>입니다.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {[
+                  { file: "llms.txt", color: T.teal, desc: "AI 크롤러에게 건네는 브로셔입니다. 워터의 사업 개요, 충전소 현황, 주요 팩트를 AI가 읽을 수 있는 형식으로 배치합니다." },
+                  { file: "robots.txt", color: T.warn, desc: "AI 크롤러 출입 정책입니다. 현재 허용 정책이 없습니다. 명시적으로 허용해야 AI가 접근할 수 있습니다." },
+                  { file: "Schema.org (JSON-LD)", color: T.purple, desc: "워터가 전국 고속도로 휴게소 중심의 전기차 급속충전 네트워크를 운영한다는 사실을 AI가 정확하게 이해하도록 구조화하는 코드입니다." },
+                ].map((item, i) => (
+                  <div key={i} style={{ display: "flex", gap: 16, padding: "14px 16px", background: `${T.bg}cc`, borderLeft: `2px solid ${item.color}`, alignItems: "flex-start" }}>
+                    <span className="sans" style={{ fontSize: 12, fontWeight: 500, color: item.color, minWidth: 140, paddingTop: 2, letterSpacing: 0.5 }}>{item.file}</span>
+                    <span style={{ fontSize: 12, color: T.textDim, lineHeight: 1.7, fontWeight: 400 }}>{item.desc}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* === DIAGNOSIS === */}
         {activeSection === "diagnosis" && (
           <div className="section">
@@ -289,7 +424,7 @@ export default function WaterAIReport() {
             </div>
 
             <div className="sans" style={{ display: "flex", gap: 16, marginBottom: 20, fontSize: 11, color: T.textDim }}>
-              {[["미적용", T.bad, criticalCount], ["확인", T.teal, confirmedCount], ["미확인", T.warn, warningCount], ["적용", T.good, goodCount]].map(([l, c, n]) => (
+              {[["미적용", T.bad, criticalCount], ["미확인", T.warn, warningCount], ["양호", T.good, goodCount]].map(([l, c, n]) => (
                 <span key={l} style={{ display: "flex", alignItems: "center", gap: 5 }}>
                   <span style={{ width: 8, height: 2, background: c, display: "inline-block" }} />{l} ({n})
                 </span>
@@ -297,8 +432,12 @@ export default function WaterAIReport() {
             </div>
 
             <div style={{ marginBottom: 24 }}>
-              {liveDiagnosis.map((item, i) => (
-                <div key={i} className="diag-row" onClick={() => setExpandedDiag(expandedDiag === i ? null : i)} style={{ background: expandedDiag === i ? T.accentSoft : "transparent" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                <div style={{ fontSize: 13, fontWeight: 500 }}>실행 과제</div>
+                <span className="sans" style={{ fontSize: 10, color: T.teal, padding: "2px 10px", background: T.tealSoft, border: `1px solid ${T.tealBorder}` }}>한 번 실행 후 완료</span>
+              </div>
+              {diagnosisActionItems.map((item, i) => (
+                <div key={i} className="diag-row" onClick={() => setExpandedDiag(expandedDiag === `a${i}` ? null : `a${i}`)} style={{ background: expandedDiag === `a${i}` ? T.accentSoft : "transparent" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <StatusBadge status={item.status} />
@@ -306,7 +445,31 @@ export default function WaterAIReport() {
                     </div>
                     <ScopeBadge scope={item.scope} />
                   </div>
-                  {expandedDiag === i && (
+                  {expandedDiag === `a${i}` && (
+                    <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${T.border}` }}>
+                      <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.8, fontWeight: 400, marginBottom: 10 }}>{item.detail}</div>
+                      <div style={{ fontSize: 13, color: T.teal, lineHeight: 1.7, fontWeight: 400 }}>→ {item.action}</div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                <div style={{ fontSize: 13, fontWeight: 500 }}>주기적 모니터링</div>
+                <span className="sans" style={{ fontSize: 10, color: T.warn, padding: "2px 10px", background: T.warnSoft, border: `1px solid ${T.warnBorder}` }}>지속 관리 필요</span>
+              </div>
+              {diagnosisMonitorItems.map((item, i) => (
+                <div key={i} className="diag-row" onClick={() => setExpandedDiag(expandedDiag === `m${i}` ? null : `m${i}`)} style={{ background: expandedDiag === `m${i}` ? T.accentSoft : "transparent" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <StatusBadge status={item.status} />
+                      <span style={{ fontSize: 14, fontWeight: 400 }}>{item.name}</span>
+                    </div>
+                    <ScopeBadge scope={item.scope} />
+                  </div>
+                  {expandedDiag === `m${i}` && (
                     <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${T.border}` }}>
                       <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.8, fontWeight: 400, marginBottom: 10 }}>{item.detail}</div>
                       <div style={{ fontSize: 13, color: T.teal, lineHeight: 1.7, fontWeight: 400 }}>→ {item.action}</div>
@@ -448,9 +611,12 @@ export default function WaterAIReport() {
                   );
                 })}
               </div>
-              <div style={{ padding: "14px 18px", border: `1px solid ${T.badBorder}`, background: T.badSoft, fontSize: 13, color: T.textSub, lineHeight: 1.8, fontWeight: 400 }}>
-                <span style={{ color: T.bad, fontWeight: 500 }}>water (워터)</span> — 자연 질문 16개에서 5개 AI 모두 <span style={{ color: T.bad, fontWeight: 500 }}>0/80 미언급</span>. 타 CPO는 웹 검색 없이도 AI가 알고 있는 반면, 워터는 이름을 직접 물어야 겨우 인지합니다.
-              </div>
+              {(() => {
+                const totalMentions = livePrompts.reduce((s, p) => s + (p.chatgpt > 0 ? 1 : 0) + (p.claude > 0 ? 1 : 0) + (p.gemini > 0 ? 1 : 0) + (p.grok > 0 ? 1 : 0) + (p.perplexity > 0 ? 1 : 0), 0);
+                return <div style={{ padding: "14px 18px", border: `1px solid ${T.badBorder}`, background: T.badSoft, fontSize: 13, color: T.textSub, lineHeight: 1.8, fontWeight: 400 }}>
+                  <span style={{ color: T.bad, fontWeight: 500 }}>water (워터)</span> — 자연 질문 16개 × 5개 AI = 80회 중 <span style={{ color: T.bad, fontWeight: 500 }}>{totalMentions}/80 언급</span>. 대부분의 AI가 워터를 자발적으로 추천하지 않으며, 이름을 직접 물어야 겨우 인지합니다.
+                </div>;
+              })()}
             </div>
 
             {/* 개선 시뮬레이션 */}
@@ -743,42 +909,13 @@ export default function WaterAIReport() {
             </div>
 
             <div style={{ display: "flex", gap: 6, marginBottom: 20 }}>
-              {[["diag", "기술 진단"], ["ai", "AI 노출 테스트"], ["channel", "충전소 채널"], ["action", "액션플랜"]].map(([k, label]) => (
+              {[["ai", "AI 노출 테스트"], ["channel", "충전소 채널"], ["action", "액션플랜"]].map(([k, label]) => (
                 <button key={k} onClick={() => setAdminTab(k)} className="sans"
                   style={{ padding: "7px 16px", cursor: "pointer", fontSize: 12, border: `1px solid ${adminTab === k ? T.accent : T.border}`, background: adminTab === k ? T.accentSoft : "transparent", color: adminTab === k ? T.accent : T.textDim }}>
                   {label}
                 </button>
               ))}
             </div>
-
-            {adminTab === "diag" && (
-              <div>
-                <div style={{ border: `1px solid ${T.border}`, overflow: "hidden", marginBottom: 8 }}>
-                  <div className="admin-row" style={{ gridTemplateColumns: "84px 120px 70px 1fr 1fr 36px", background: T.surfaceAlt }}>
-                    {["상태", "항목명", "범위", "상세 설명", "액션", ""].map(h => (
-                      <div key={h} className="sans" style={{ fontSize: 11, color: T.textDim }}>{h}</div>
-                    ))}
-                  </div>
-                  {liveDiagnosis.map((d, i) => (
-                    <div key={i} className="admin-row" style={{ gridTemplateColumns: "84px 120px 70px 1fr 1fr 36px" }}>
-                      <select className="admin-select" value={d.status} onChange={e => updateDiagItem(i, "status", e.target.value)}>
-                        {["critical", "confirmed", "warning", "good"].map(o => (
-                          <option key={o} value={o}>{{ critical: "미적용", confirmed: "확인", warning: "미확인", good: "적용" }[o]}</option>
-                        ))}
-                      </select>
-                      <input className="admin-input" value={d.name} onChange={e => updateDiagItem(i, "name", e.target.value)} />
-                      <select className="admin-select" value={d.scope} onChange={e => updateDiagItem(i, "scope", e.target.value)}>
-                        {["주도", "협업요청", "범위밖", "-"].map(o => <option key={o}>{o}</option>)}
-                      </select>
-                      <input className="admin-input" value={d.detail} onChange={e => updateDiagItem(i, "detail", e.target.value)} />
-                      <input className="admin-input" value={d.action} onChange={e => updateDiagItem(i, "action", e.target.value)} />
-                      <button onClick={e => { e.stopPropagation(); removeDiagItem(i); }} style={{ background: T.badSoft, border: `1px solid ${T.badBorder}`, color: T.bad, cursor: "pointer", fontSize: 14, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>✕</button>
-                    </div>
-                  ))}
-                </div>
-                <button onClick={addDiagItem} style={{ padding: "8px 16px", border: `1px dashed ${T.tealBorder}`, background: "transparent", color: T.teal, cursor: "pointer", fontSize: 12, width: "100%" }}>+ 항목 추가</button>
-              </div>
-            )}
 
             {adminTab === "ai" && (
               <div>
