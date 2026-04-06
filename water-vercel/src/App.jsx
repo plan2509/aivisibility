@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 
-const SECTIONS = ["diagnosis", "ai_test", "map", "action", "timeline"];
+const SECTIONS = ["diagnosis", "ai_test", "map"];
 const SECTION_LABELS = {
   diagnosis: "웹사이트 기술 진단",
   ai_test: "AI 노출 테스트",
   map: "충전소 노출 채널",
-  action: "서비스 기획 액션플랜",
-  timeline: "실행 타임라인",
 };
 
 const diagnosisActionItems = [
@@ -229,7 +227,7 @@ export default function WaterAIReport() {
   return (
     <div style={{ fontFamily: "'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif", background: T.bg, color: T.text, minHeight: "100vh" }}>
       <style>{`
-        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+        @import url('https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css');
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap');
         * { box-sizing: border-box; margin: 0; }
         ::selection { background: ${T.accent}30; }
@@ -602,106 +600,6 @@ export default function WaterAIReport() {
             </div>
           </div>
         )}
-
-        {/* === ACTION === */}
-        {activeSection === "action" && (
-          <div className="section">
-            <div style={{ marginBottom: 20 }}>
-              <h2 className="serif" style={{ fontSize: 24, fontWeight: 400, marginBottom: 8 }}>서비스 기획 액션플랜</h2>
-              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                <p style={{ fontSize: 13, color: T.textDim, fontWeight: 400 }}>서비스 기획 직접 할당 범위. 설계는 서비스 기획, 매뉴얼 기반 실행은 유관부서.</p>
-                <span className="sans" style={{ fontSize: 11, padding: "3px 10px", background: T.goodSoft, border: `1px solid ${T.goodBorder}`, color: T.good, fontWeight: 500, flexShrink: 0 }}>
-                  설계 완료 {liveActionItems.filter(a=>a.done).length}/{liveActionItems.length}
-                </span>
-              </div>
-            </div>
-
-            <div className="sans" style={{ display: "grid", gridTemplateColumns: "44px 1fr 70px 50px 70px 50px", gap: 8, padding: "8px 14px", fontSize: 10, color: T.textDim, borderBottom: `1px solid ${T.border}`, letterSpacing: 0.5, marginBottom: 4 }}>
-              <span>상태</span><span>과제</span><span>기간</span><span>난이도</span><span>협업</span><span>CEO</span>
-            </div>
-
-            {liveActionItems.map((a, i) => (
-              <div key={i} style={{ display: "grid", gridTemplateColumns: "44px 1fr 70px 50px 70px 50px", gap: 8, padding: "14px 16px", borderBottom: `1px solid ${T.border}`, alignItems: "center", fontSize: 13, background: a.done ? T.goodSoft : "transparent" }}>
-                <span style={{ fontSize: 14, textAlign: "center" }}>{a.done ? "✓" : "○"}</span>
-                <span style={{ fontWeight: 400, color: a.done ? T.good : T.text }}>{a.task}{a.done ? " — 설계 완료" : ""}</span>
-                <span className="sans" style={{ fontSize: 11, color: T.textDim }}>{a.period}</span>
-                <span className="sans" style={{ fontSize: 11, color: T.textDim }}>{a.difficulty}</span>
-                <span className="sans" style={{ fontSize: 11, color: T.teal }}>{a.collab}</span>
-                <span className="sans" style={{ fontSize: 11, color: T.purple, fontWeight: 500 }}>{a.ceo}</span>
-              </div>
-            ))}
-
-            <div style={{ marginTop: 28, padding: 24, border: `1px solid ${T.purpleBorder}`, background: T.purpleSoft }}>
-              <div style={{ fontSize: 13, fontWeight: 500, color: T.purple, marginBottom: 12 }}>핵심 용어 참고</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                {[["AEO","AI 답변 엔진에서 브랜드 노출 최적화"],["GEO","생성형 검색 결과 노출 최적화"],["Schema.org","AI가 이해하는 표준 구조화 데이터"],["llms.txt","AI 크롤러용 사이트 가이드 파일"],["E-E-A-T","AI가 콘텐츠 신뢰도 평가하는 기준"],["Citation","AI 답변 시 출처 참조/링크"]].map(([term, desc], i) => (
-                  <div key={i} style={{ fontSize: 13, lineHeight: 1.6 }}>
-                    <span style={{ color: T.purple, fontWeight: 500 }}>{term}</span>
-                    <span style={{ color: T.textDim, fontWeight: 400 }}> — {desc}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* === TIMELINE === */}
-        {activeSection === "timeline" && (
-          <div className="section">
-            <div style={{ marginBottom: 28 }}>
-              <h2 className="serif" style={{ fontSize: 24, fontWeight: 400, marginBottom: 8 }}>실행 타임라인</h2>
-              <p style={{ fontSize: 13, color: T.textDim, fontWeight: 400, lineHeight: 1.8 }}>서비스 기획 담당 범위 내 4개 Phase.</p>
-            </div>
-
-            <div style={{ display: "grid", gap: 14 }}>
-              {phases.map((p, i) => {
-                const ss = { "완료": { bg: T.goodSoft, color: T.good, label: "완료" }, "진행중": { bg: T.tealSoft, color: T.teal, label: "진행 중" }, "예정": { bg: `${T.textDim}10`, color: T.textDim, label: "예정" } }[p.status];
-                return (
-                  <div key={i} className="phase-card" style={{ borderLeft: `3px solid ${p.color}` }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <span className="sans" style={{ fontSize: 10, fontWeight: 500, color: p.color, letterSpacing: 1.5, textTransform: "uppercase" }}>Phase {p.phase}</span>
-                        <span className="serif" style={{ fontSize: 16 }}>{p.name}</span>
-                        <span className="sans" style={{ fontSize: 10, padding: "3px 10px", background: ss.bg, color: ss.color, letterSpacing: 0.5 }}>{ss.label}</span>
-                      </div>
-                      <span className="sans" style={{ fontSize: 11, color: T.textDim }}>{p.period}</span>
-                    </div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                      {p.items.map((item, j) => (
-                        <span key={j} className="sans" style={{ fontSize: 11, padding: "6px 14px", background: item.includes("✓") ? T.goodSoft : "transparent", border: `1px solid ${item.includes("✓") ? T.goodBorder : item.startsWith("→") ? `${p.color}30` : T.border}`, color: item.includes("✓") ? T.good : item.startsWith("→") ? p.color : T.textSub, fontWeight: 400 }}>
-                          {item}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div style={{ width: "100%", height: 1, background: T.border, margin: "28px 0" }} />
-
-            <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginBottom: 20 }}>
-              <div style={{ flex: 1, minWidth: 200, padding: 20, border: `1px solid ${T.tealBorder}`, background: T.tealSoft }}>
-                <div className="sans" style={{ fontSize: 9, color: T.teal, letterSpacing: 2, marginBottom: 8 }}>과제 #1 연결</div>
-                <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.7, fontWeight: 400 }}>위키피디아·공개 지식 DB 보완이 핵심 목표. Schema.org, llms.txt, FAQ 설계·산출이 서비스 기획 기여 범위</div>
-              </div>
-              <div style={{ flex: 1, minWidth: 200, padding: 20, border: `1px solid ${T.accent}30`, background: T.accentSoft }}>
-                <div className="sans" style={{ fontSize: 9, color: T.accent, letterSpacing: 2, marginBottom: 8 }}>과제 #6 연결</div>
-                <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.7, fontWeight: 400 }}>22개 채널 전수조사 + 체크리스트 + 모니터링 매뉴얼 설계 → 매뉴얼 기반 실제 수행은 유관부서</div>
-              </div>
-            </div>
-
-            <div style={{ padding: 24, border: `1px solid ${T.purpleBorder}`, background: T.purpleSoft }}>
-              <div className="sans" style={{ fontSize: 9, color: T.purple, letterSpacing: 3, textTransform: "uppercase", marginBottom: 12 }}>Phase 3 이후 — 장기 비전</div>
-              <p style={{ fontSize: 13, color: T.textSub, lineHeight: 2, fontWeight: 400 }}>
-                대표님께서는 과제 지시 전 Claude와의 대화에서 <span style={{ color: T.text, fontWeight: 500 }}>MCP(Model Context Protocol) 서버 구축</span>을 장기 목표로 언급했습니다.
-                사용자가 AI에게 "서울-부산 중간에 충전 예약해줘"라고 하면 AI가 워터 서버를 직접 호출해 예약·결제까지 완료하는 구조입니다.
-                한국 CPO 최초 구현 시 강력한 차별화 포인트이자 PR 소재가 됩니다.
-                Phase 1~2의 구조화 데이터 작업이 이 장기 비전의 기술적 토대입니다.
-              </p>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* ── Footer ── */}
@@ -743,7 +641,7 @@ export default function WaterAIReport() {
             </div>
 
             <div style={{ display: "flex", gap: 6, marginBottom: 20 }}>
-              {[["diag", "기술 진단"], ["ai", "AI 노출 테스트"], ["channel", "충전소 채널"], ["action", "액션플랜"]].map(([k, label]) => (
+              {[["diag", "기술 진단"], ["ai", "AI 노출 테스트"], ["channel", "충전소 채널"]].map(([k, label]) => (
                 <button key={k} onClick={() => setAdminTab(k)} className="sans"
                   style={{ padding: "7px 16px", cursor: "pointer", fontSize: 12, border: `1px solid ${adminTab === k ? T.accent : T.border}`, background: adminTab === k ? T.accentSoft : "transparent", color: adminTab === k ? T.accent : T.textDim }}>
                   {label}
@@ -860,40 +758,6 @@ export default function WaterAIReport() {
               </div>
             )}
 
-            {adminTab === "action" && (
-              <div>
-                <div style={{ border: `1px solid ${T.border}`, overflow: "hidden", marginBottom: 8 }}>
-                  <div className="admin-row" style={{ gridTemplateColumns: "1fr 80px 50px 50px 50px 60px 36px", background: T.surfaceAlt }}>
-                    {["과제명", "기간", "난이도", "협업", "CEO", "완료", ""].map(h => (
-                      <div key={h} className="sans" style={{ fontSize: 11, color: T.textDim }}>{h}</div>
-                    ))}
-                  </div>
-                  {liveActionItems.map((a, i) => (
-                    <div key={i} className="admin-row" style={{ gridTemplateColumns: "1fr 80px 50px 50px 50px 60px 36px" }}>
-                      <input className="admin-input" value={a.task} onChange={e => updateActionItem(i, "task", e.target.value)} />
-                      <input className="admin-input" value={a.period || ""} onChange={e => updateActionItem(i, "period", e.target.value)} />
-                      <select className="admin-select" value={a.difficulty} onChange={e => updateActionItem(i, "difficulty", e.target.value)}>
-                        {["하", "중", "상"].map(o => <option key={o}>{o}</option>)}
-                      </select>
-                      <select className="admin-select" value={a.collab} onChange={e => updateActionItem(i, "collab", e.target.value)}>
-                        {["개발", "유관부서", "마케팅", "디자인", "전사"].map(o => <option key={o}>{o}</option>)}
-                      </select>
-                      <select className="admin-select" value={a.ceo} onChange={e => updateActionItem(i, "ceo", e.target.value)}>
-                        {["#1", "#2", "#3", "#4", "#5", "#6"].map(o => <option key={o}>{o}</option>)}
-                      </select>
-                      <div onClick={() => toggleActionItem(i)} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
-                        <div style={{ width: 18, height: 18, border: `2px solid ${a.done ? T.teal : T.border}`, background: a.done ? T.teal : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          {a.done && <span style={{ color: "#fff", fontSize: 10, fontWeight: 700 }}>✓</span>}
-                        </div>
-                        <span className="sans" style={{ fontSize: 11, color: a.done ? T.teal : T.textDim }}>{a.done ? "완료" : "진행중"}</span>
-                      </div>
-                      <button onClick={e => { e.stopPropagation(); removeActionItem(i); }} style={{ background: T.badSoft, border: `1px solid ${T.badBorder}`, color: T.bad, cursor: "pointer", fontSize: 14, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>✕</button>
-                    </div>
-                  ))}
-                </div>
-                <button onClick={addActionItem} style={{ padding: "8px 16px", border: `1px dashed ${T.tealBorder}`, background: "transparent", color: T.teal, cursor: "pointer", fontSize: 12, width: "100%" }}>+ 과제 추가</button>
-              </div>
-            )}
           </div>
         </div>
       )}
