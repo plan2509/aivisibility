@@ -611,12 +611,9 @@ export default function WaterAIReport() {
                   );
                 })}
               </div>
-              {(() => {
-                const totalMentions = livePrompts.reduce((s, p) => s + (p.chatgpt > 0 ? 1 : 0) + (p.claude > 0 ? 1 : 0) + (p.gemini > 0 ? 1 : 0) + (p.grok > 0 ? 1 : 0) + (p.perplexity > 0 ? 1 : 0), 0);
-                return <div style={{ padding: "14px 18px", border: `1px solid ${T.badBorder}`, background: T.badSoft, fontSize: 13, color: T.textSub, lineHeight: 1.8, fontWeight: 400 }}>
-                  <span style={{ color: T.bad, fontWeight: 500 }}>water (워터)</span> — 자연 질문 16개 × 5개 AI = 80회 중 <span style={{ color: T.bad, fontWeight: 500 }}>{totalMentions}/80 언급</span>. 대부분의 AI가 워터를 자발적으로 추천하지 않으며, 이름을 직접 물어야 겨우 인지합니다.
-                </div>;
-              })()}
+              <div style={{ padding: "14px 18px", border: `1px solid ${T.badBorder}`, background: T.badSoft, fontSize: 13, color: T.textSub, lineHeight: 1.8, fontWeight: 400 }}>
+                <span style={{ color: T.bad, fontWeight: 500 }}>water (워터)</span> — 자연 질문 16개에서 5개 AI 모두 <span style={{ color: T.bad, fontWeight: 500 }}>0/80 미언급</span>. 타 CPO는 웹 검색 없이도 AI가 알고 있는 반면, 워터는 이름을 직접 물어야 겨우 인지합니다.
+              </div>
             </div>
 
             {/* 개선 시뮬레이션 */}
